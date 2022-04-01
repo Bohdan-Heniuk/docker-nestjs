@@ -1,11 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './users.model';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { InjectModel } from '@nestjs/sequelize';
 import { LoginUserDto } from './dto/login-user.dto';
 import * as jwt from 'jsonwebtoken';
 import { ILogin } from './user.types';
+import { BannedUser } from 'src/banned_users/banned_users.model';
 
 @Injectable()
 export class UsersService {
@@ -30,12 +31,21 @@ export class UsersService {
 
     async login(userData: LoginUserDto): Promise<ILogin> {
         const {email, password} = userData
-        const user = await this.userRepository.findOne({where: {email}})
+        const user = await this.userRepository.findOne({where: {email}, include: {all: true}})
         
-        const isPasswordEquals = await bcrypt.compare(password, user.password)
+        if(!user) {
+            throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST);
+        }
+
+        const isPasswordEquals = await bcrypt.compare(password, user?.password || '')
 
         if(!user || !isPasswordEquals) {
             throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST);
+        }
+
+        const isBanned = await BannedUser.findByPk(user?.id)
+        if(isBanned) {
+            return this.generateToken({message: "Blocked"})   
         }
 
         return this.generateToken(user.toJSON())   

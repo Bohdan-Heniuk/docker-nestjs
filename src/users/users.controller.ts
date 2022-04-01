@@ -9,7 +9,6 @@ export class UsersController {
 
     @Post('/register')
     async registration(@Body() userData: CreateUserDto) {
-        console.log(`.${process.env.NODE_ENV}.env`,)
         return this.UsersService.register(userData)
     }
 

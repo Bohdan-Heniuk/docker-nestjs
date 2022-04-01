@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Sequelize } from 'sequelize/types';
+import { BannedUser } from 'src/banned_users/banned_users.model';
 import { UsersController } from './users.controller';
 import { User } from './users.model';
 import { UsersService } from './users.service';
