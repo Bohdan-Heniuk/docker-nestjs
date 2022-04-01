@@ -2,6 +2,9 @@ version: '3'
 
 services:
   db:
+    build:
+      context: .
+      dockerfile: Dockerfile-db
     image: postgres:alpine
     restart: always
     env_file:
@@ -13,7 +16,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-app
     env_file:
       - .${NODE_ENV}.env  
     ports:

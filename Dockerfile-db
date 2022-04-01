@@ -1,0 +1,6 @@
+FROM postgres:alpine
+
+WORKDIR /usr/src/app/db
+
+VOLUME [ "pgdata:/var/lib/postgresql/data" ]:
+      
